@@ -8,6 +8,7 @@ function init() {
     loginForm.addEventListener('submit', function(event) {
         event.preventDefault()
         localStorage.setItem('myUserName', userName.value);
-        window.location = "welcome.html"
+        window.location.replace = "welcome.html"
     })
 }
+

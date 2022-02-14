@@ -8,11 +8,6 @@
     <title>Welcome !</title>
 </head>
 <body>
-    <h1 id="welcome-message"> Welcome </h1>  
+    <h1>Hi <%= name %></h1>
 </body>
-    <script>
-        var data = localStorage.getItem('myUserName');
-        console.log(data)
-        document.getElementById("welcome-message").innerHTML += data;
-    </script>
 </html>
