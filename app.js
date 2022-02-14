@@ -3,11 +3,18 @@ const http = require('http');
 const path = require("path");
 const bodyParser = require('body-parser');
 const users = require('./data').userDB;
-
+app.use(function (req, res, next) {
+    res.removeHeader("x-powered-by");
+    next();
+  });
 const app = express();
 const server = http.createServer(app);
 
+
+
+
 app.use(bodyParser.urlencoded({extended: false}));
+
 app.use(express.static(path.join(__dirname,'./public')));
 
 
