@@ -4,15 +4,16 @@ const path = require("path");
 const bodyParser = require('body-parser');
 const users = require('./data').userDB;
 const app = express();
+app.use(function (req, res, next) {
+    res.removeHeader("x-powered-by");
+    next();
+  });
 const server = http.createServer(app);
-
-
 
 
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(express.static(path.join(__dirname,'./public')));
-
 
 app.get('/',(req,res) => {
     res.sendFile(path.join(__dirname,'./public/index.html'));
@@ -23,7 +24,6 @@ app.post('/register', async (req, res) => {
     try{
         let foundUser = users.find((data) => req.body.username === data.username);
         if (!foundUser) {
-        
             let newUser = {
                 id: Date.now(),
                 username: req.body.username,
@@ -47,9 +47,14 @@ app.post('/login', async (req, res) => {
     
             let submittedPass = req.body.password; 
             let storedPass = foundUser.password; 
+            function htmlEncode(str){
+                return String(str).replace(/[^\w. ]/gi, function(c){
+                    return '&#'+c.charCodeAt(0)+';';
+                });
+            }
 
                 if (submittedPass == storedPass) {
-                let usrname = foundUser.username;
+                let usrname = htmlEncode((foundUser.username));
                 res.send(`<div align ='center'><h3>Hello ${usrname}</h3></div>`);
             } else {
                 res.send("<div align ='center'><h2>Erreur de mail ou mdp</h2></div><br><br><div align ='center'><a href='./login.html'>Retour login</a></div>");
