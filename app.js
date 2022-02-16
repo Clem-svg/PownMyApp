@@ -9,6 +9,7 @@ app.use(function (req, res, next) {
     next();
   });
 const server = http.createServer(app);
+const randtoken = require('rand-token');
 
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -29,9 +30,13 @@ app.post('/register', async (req, res) => {
                 username: req.body.username,
                 password: req.body.password,
             };
+            accessToken =  randtoken.generate(16)
             users.push(newUser);
             console.log('User list', users);
-            res.redirect("login.html");
+            // res.redirect("login.html");
+            return res.cookie({
+                accessToken,
+              });
         } else {
             res.send("<div align ='center'><h2>Nom d'utilisateur déjà utilisé</h2></div><br><br><div align='center'><a href='./registration.html'>Retour création compte</a></div>");
         }
@@ -39,6 +44,14 @@ app.post('/register', async (req, res) => {
         res.send("Internal server error");
     }
 });
+
+app.get('/csrf', async (req, res) => {
+    try{
+        accessToken =  randtoken.generate(16)
+        return res.send({
+            accessToken,
+            });
+        }});
 
 app.post('/login', async (req, res) => {
     try{
@@ -54,7 +67,7 @@ app.post('/login', async (req, res) => {
             }
 
                 if (submittedPass == storedPass) {
-                let usrname = htmlEncode((foundUser.username));
+                let usrname = foundUser.username;
                 res.send(`<div align ='center'><h3>Hello ${usrname}</h3></div>`);
             } else {
                 res.send("<div align ='center'><h2>Erreur de mail ou mdp</h2></div><br><br><div align ='center'><a href='./login.html'>Retour login</a></div>");
