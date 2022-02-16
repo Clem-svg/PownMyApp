@@ -25,6 +25,11 @@
 	</form>
 	<br><br>
         <a id="mylink" href="./login.html">Connection</a>
-    
+	<script>
+	fetch("/createcsrf")
+	.then(function(response) {
+		console.log(response)
+	});
+</script>
 </body>
 </html>

@@ -3,10 +3,10 @@ const http = require('http');
 const path = require("path");
 const bodyParser = require('body-parser');
 const users = require('./data').userDB;
+const tokens = require('./tokenData').tokenDB;
 const app = express();
 const server = http.createServer(app);
 const randtoken = require('rand-token');
-
 
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -16,6 +16,26 @@ app.get('/',(req,res) => {
     res.sendFile(path.join(__dirname,'./public/index.html'));
 });
 
+app.get ('/createcsrf', function (req, res) {
+    try {
+        let accessToken = randtoken.generate(16)
+        tokens.push(accessToken)
+        console.log(tokens)
+        res.send(accessToken)
+    }
+    catch {
+        res.send("Internal server error");
+    }
+})
+
+app.get ('/validatecsrf', function (req, res) {
+    try {
+        res.send(tokens[tokens.length - 1])   
+    }
+    catch {
+        res.send("Internal server error");
+    }
+})
 
 app.post('/register', async (req, res) => {
     try{
@@ -26,13 +46,11 @@ app.post('/register', async (req, res) => {
                 username: req.body.username,
                 password: req.body.password,
             };
-            accessToken =  randtoken.generate(16)
             users.push(newUser);
             console.log('User list', users);
-            // res.redirect("login.html");
-            return res.cookie({
-                accessToken,
-              });
+            console.log(tokens)
+
+            res.redirect("login.html");
         } else {
             res.send("<div align ='center'><h2>Nom d'utilisateur déjà utilisé</h2></div><br><br><div align='center'><a href='./registration.html'>Retour création compte</a></div>");
         }
@@ -41,16 +59,10 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.get('/csrf', async (req, res) => {
-    try{
-        accessToken =  randtoken.generate(16)
-        return res.send({
-            accessToken,
-            });
-        }});
 
 app.post('/login', async (req, res) => {
     try{
+
         let foundUser = users.find((data) => req.body.username === data.username);
         if (foundUser) {
     
@@ -61,7 +73,6 @@ app.post('/login', async (req, res) => {
                     return '&#'+c.charCodeAt(0)+';';
                 });
             }
-
                 if (submittedPass == storedPass) {
                 let usrname = foundUser.username;
                 res.send(`<div align ='center'><h3>Hello ${usrname}</h3></div>`);
@@ -71,7 +82,7 @@ app.post('/login', async (req, res) => {
         }
         else {
     
-            res.send("<div align ='center'><h2>Invalid email or password</h2></div><br><br><div align='center'><a href='./login.html'>Retour login<a><div>");
+            res.send("<div align ='center'><h2>Email ou mot de passe invalide</h2></div><br><br><div align='center'><a href='./login.html'>Retour login<a><div>");
         }
     } catch{
         res.send("Internal server error");

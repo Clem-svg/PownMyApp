@@ -20,6 +20,8 @@
 			<input type="password" id = "password" name="password" required>
 			<br><br>
 
+			<input id ="token" name="token">
+			<!-- injection du token puis verif en back -->
 			<button type ="reset">Reset</button>
 			<button type ="submit">Connection</button>
 		</fieldset>
@@ -28,4 +30,14 @@
     <a id="mylink" href="./registration.html">Créer un compte</a>
 
 </body>
+<script>
+	fetch("/validatecsrf")
+	.then(function(response) {
+   		response.text()
+		.then(function(text) {
+			document.getElementById('token').value = text;
+			console.log(text)
+  		});
+	});
+</script>
 </html>
