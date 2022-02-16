@@ -4,10 +4,6 @@ const path = require("path");
 const bodyParser = require('body-parser');
 const users = require('./data').userDB;
 const app = express();
-app.use(function (req, res, next) {
-    res.removeHeader("x-powered-by");
-    next();
-  });
 const server = http.createServer(app);
 const randtoken = require('rand-token');
 
